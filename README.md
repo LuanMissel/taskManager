@@ -44,7 +44,7 @@ Essa organização facilita a manutenção, a compreensão e a evolução do có
 1. Clone o repositório:
 
    ```bash
-   git clone URL_DO_SEU_REPOSITORIO
+   git clone [URL_DO_SEU_REPOSITORIO](https://github.com/LuanMissel/taskManager)
    ```
 
 2. Entre na pasta do projeto:
