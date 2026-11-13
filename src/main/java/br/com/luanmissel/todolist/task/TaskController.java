@@ -58,9 +58,10 @@ public final ITaskRepository iTaskRepository;
             return taskModel;
         }
 
-        @DeleteMapping("/task/{id}")
-        public String delete ( @PathVariable int id){
-            return "A task de Id: " + id + "foi excluída com sucesso!";
+        @DeleteMapping("/{id}")
+        public ResponseEntity<String> delete( @PathVariable UUID id){
+            iTaskRepository.deleteById(id);
+            return ResponseEntity.ok("A task de Id: " + id + "foi excluída com sucesso!");
         }
 }
 
