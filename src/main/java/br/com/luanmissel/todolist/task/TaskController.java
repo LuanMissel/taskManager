@@ -17,8 +17,8 @@ import java.util.UUID;
 @AllArgsConstructor
 
 public class TaskController {
-    @Autowired
-    public final ITaskRepository iTaskRepository;
+@Autowired
+public final ITaskRepository iTaskRepository;
 
     @PostMapping("/")
     public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
@@ -33,34 +33,34 @@ public class TaskController {
 
         if (taskModel.getStartAt().isAfter(taskModel.getEndAt())) {
 
-        if(currentDate.isAfter(taskModel.getStartAt().toLocalDate()) || currentDate.isAfter(taskModel.getEndAt().toLocalDate())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio / data de fim deve ser maior que a data atual");
-        }
+            if (currentDate.isAfter(taskModel.getStartAt().toLocalDate()) || currentDate.isAfter(taskModel.getEndAt().toLocalDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio / data de fim deve ser maior que a data atual");
+            }
 
-        if(taskModel.getStartAt().isAfter(taskModel.getEndAt())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio deve ser maior que a data atual");
+            if (taskModel.getStartAt().isAfter(taskModel.getEndAt())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio deve ser maior que a data atual");
+            }
         }
-
         var task = this.iTaskRepository.save(taskModel);
         return ResponseEntity.status(HttpStatus.OK).body(task);
     }
+        @GetMapping("/")
+        public List<TaskModel> list (HttpServletRequest request){
+            var idUser = request.getAttribute("idUser");
+            var tasks = this.iTaskRepository.findByUserId((UUID) idUser);
+            return tasks;
+        }
 
-    @GetMapping("/")
-    public List<TaskModel> list(HttpServletRequest request) {
-        var idUser = request.getAttribute("idUser");
-        var tasks = this.iTaskRepository.findByUserId((UUID) idUser);
-        return tasks;
-    }
+        @PutMapping("/{id}")
+        public TaskModel update (@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id){
+            taskModel.setId(id);
+            this.iTaskRepository.save(taskModel);
+            return taskModel;
+        }
 
-    @PutMapping("/{id}")
-    public TaskModel update(@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id) {
-        taskModel.setId(id);
-        this.iTaskRepository.save(taskModel);
-        return taskModel;
-    }
-
-    @DeleteMapping("/task/{id}")
-    public String delete(@PathVariable int id) {
-        return "A task de Id: " + id + "foi excluída com sucesso!";
-    }
+        @DeleteMapping("/task/{id}")
+        public String delete ( @PathVariable int id){
+            return "A task de Id: " + id + "foi excluída com sucesso!";
+        }
 }
+
