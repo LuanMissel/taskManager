@@ -6,13 +6,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
 
 
 @RestController
 @RequestMapping("/v1/users")
 public class UserController {
     @Autowired
-    private IUserRepository UserRepository;
+    public final IUserRepository UserRepository;
+
+    public UserController(IUserRepository userRepository) {
+        UserRepository = userRepository;
+    }
 
     @PostMapping("/")
     public ResponseEntity create(@RequestBody UserModel userModel) {
@@ -34,7 +39,8 @@ public class UserController {
     }
 
     @DeleteMapping("/task/{id}")
-    public String delete(@PathVariable int id) {
-        return "O usuário de Id: " + id + "foi excluída com sucesso!";
+    public ResponseEntity delete(@PathVariable UUID id) {
+        UserRepository.deleteById(id);
+        return ResponseEntity.ok("O usuário de Id: " + id + "foi excluída com sucesso!");
     }
 }
