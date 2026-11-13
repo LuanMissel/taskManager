@@ -58,4 +58,9 @@ public class TaskController {
         this.iTaskRepository.save(taskModel);
         return taskModel;
     }
+
+    @DeleteMapping("/task/{id}")
+    public String delete(@PathVariable int id) {
+        return "A task de Id: " + id + "foi excluída com sucesso!";
+    }
 }

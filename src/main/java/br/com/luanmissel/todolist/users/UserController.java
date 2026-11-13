@@ -32,4 +32,9 @@ public class UserController {
         var createdUser = UserRepository.save(userModel);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
+
+    @DeleteMapping("/task/{id}")
+    public String delete(@PathVariable int id) {
+        return "O usuário de Id: " + id + "foi excluída com sucesso!";
+    }
 }
