@@ -18,8 +18,8 @@ import java.util.UUID;
 @AllArgsConstructor
 
 public class TaskController {
-    @Autowired
-    public final ITaskRepository iTaskRepository;
+@Autowired
+public final ITaskRepository iTaskRepository;
 
     @PostMapping("/")
     public ResponseEntity create(@RequestBody TaskModel taskModel, HttpServletRequest request) {
@@ -34,42 +34,35 @@ public class TaskController {
 
         if (taskModel.getStartAt().isAfter(taskModel.getEndAt())) {
 
+            if (currentDate.isAfter(taskModel.getStartAt().toLocalDate()) || currentDate.isAfter(taskModel.getEndAt().toLocalDate())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio / data de fim deve ser maior que a data atual");
+            }
+
             if (taskModel.getStartAt().isAfter(taskModel.getEndAt())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("A data de inicio deve ser maior que a data atual");
             }
-
         }
         var task = this.iTaskRepository.save(taskModel);
         return ResponseEntity.status(HttpStatus.OK).body(task);
     }
-
-    @GetMapping("/")
-    public List<TaskModel> list(HttpServletRequest request) {
-        var idUser = request.getAttribute("idUser");
-        var tasks = this.iTaskRepository.findByUserId((UUID) idUser);
-        return tasks;
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity update(@RequestBody TaskModel taskModel, @PathVariable UUID id, HttpServletRequest request) {
-
-        var task = this.iTaskRepository.findById(id).orElse(null);
-
-        var idUser = request.getAttribute("idUser");
-
-        if (task == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Task não encontrada");
+        @GetMapping("/")
+        public List<TaskModel> list (HttpServletRequest request){
+            var idUser = request.getAttribute("idUser");
+            var tasks = this.iTaskRepository.findByUserId((UUID) idUser);
+            return tasks;
         }
 
-        if (!task.getUserId().equals(idUser)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("O usuário não tem permissão para alterar essa tarefa");
+        @PutMapping("/{id}")
+        public TaskModel update (@RequestBody TaskModel taskModel, HttpServletRequest request, @PathVariable UUID id){
+            taskModel.setId(id);
+            this.iTaskRepository.save(taskModel);
+            return taskModel;
         }
 
-        Utils.copyNonNullProperties(taskModel, task);
-        var taskUpdated = this.iTaskRepository.save(task);
-        return ResponseEntity.ok().body(taskUpdated);
-
-    }
+        @DeleteMapping("/{id}")
+        public ResponseEntity<String> delete( @PathVariable UUID id){
+            iTaskRepository.deleteById(id);
+            return ResponseEntity.ok("A task de Id: " + id + "foi excluída com sucesso!");
+        }
 }
 
